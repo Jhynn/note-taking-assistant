@@ -1,5 +1,8 @@
+import time
+
 from openai import OpenAI
 from app.core.config import settings
+from app.core.logger import logger
 
 
 client = OpenAI(
@@ -10,34 +13,36 @@ client = OpenAI(
 class LLMService:
     @staticmethod
     def generate_rag_answer(question: str, context_notes: list[dict]) -> str:
-        # 1. Format the retrieved notes into a single context string
+        # ... (código de formatação do contexto permanece o mesmo) ...
         context_texts = []
         for note in context_notes:
             context_texts.append(f"--- Note ID: {note['id']} ---\nTitle: {note['title']}\nContent: {note['content']}")
 
         full_context = "\n\n".join(context_texts)
 
-        # 2. Build the System Prompt (Prompt Engineering)
-        # Here we lock the AI down so it doesn't hallucinate
         system_prompt = (
-            "You are a helpful personal assistant managing a 'Second Brain' note system. "
-            "Answer the user's question using ONLY the context provided below. "
-            "If the context does not contain the answer, politely state that you cannot answer based on the current notes."
+            "You are a helpful personal assistant..." # (seu prompt aqui)
         )
-
         user_prompt = f"Context:\n{full_context}\n\nQuestion: {question}"
 
-        # 3. Call the LLM API
+        logger.info(f"Starting LLM generation for question: '{question}' with {len(context_notes)} context notes.")
+        start_time = time.time()
+
         try:
             response = client.chat.completions.create(
-                model=settings.LLM_MODEL, # maybe llama3-8b-8192
+                model=settings.LLM_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.2 # Low temperature means that the model will be more factual than creative
+                temperature=0.2 
             )
+
+            inference_time = time.time() - start_time
+            logger.info(f"LLM Generation successful. Inference time: {inference_time:.2f}s")
+
             return response.choices[0].message.content # type: ignore
 
         except Exception as e:
-            return f"Error communicating with LLM: {str(e)}"
+            logger.error(f"Error communicating with local LLM: {str(e)}")
+            return f"Error communicating with local LLM: {str(e)}"

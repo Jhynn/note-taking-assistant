@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+import time
+
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
+from app.core.logger import logger
 
 from app.api.endpoints import notes
 from app.core.database import db
@@ -7,6 +10,17 @@ from app.models.notes import Note
 
 app = FastAPI(title="Second Brain API", version="1.0.0")
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+
+    response = await call_next(request)
+
+    process_time = time.time() - start_time
+
+    logger.info(f"Method: {request.method} Path: {request.url.path} Status: {response.status_code} Latency: {process_time:.4f}s")
+
+    return response
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
