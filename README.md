@@ -26,11 +26,11 @@ Designed with a clean, layered architecture (DDD principles) and MLOps best prac
 
 ## Prerequisites
 
-*   Python 3.13+
+*   [Python](https://www.python.org/) 3.13+
 *   [uv](https://github.com/astral-sh/uv) installed
-*   MariaDB server running locally
+*   [MariaDB](https://mariadb.org/) server running locally
 *   [Ollama](https://ollama.com/) installed and running locally with the `llama3.2` model (`ollama pull llama3.2`)
-*   Docker (if running via container)
+*   [Docker](https://www.docker.com/) (if running via container)
 
 ## Environment Variables
 
@@ -53,7 +53,7 @@ cp .env.example .env
 3. **Download the Embedding Model:**
    Execute the script to cache the Hugging Face model locally (prevents re-downloading):
    ```bash
-   uv run python download_model.py
+   uv run python dl_model_hf.py
    ```
    *(Ensure the script saves the model to the path specified in your `.env`)*
 
@@ -122,6 +122,5 @@ note-taking-assistant/
 │   └── main.py                 (Application entry point)
 ├── .env
 ├── docker_rebuild.sh           (Auxiliary bash script for development)
-├── minhas_notas.db             (The SQLite file)
 └── README.md
 ```

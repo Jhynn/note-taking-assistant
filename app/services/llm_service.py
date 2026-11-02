@@ -13,7 +13,6 @@ client = OpenAI(
 class LLMService:
     @staticmethod
     def generate_rag_answer(question: str, context_notes: list[dict]) -> str:
-        # ... (código de formatação do contexto permanece o mesmo) ...
         context_texts = []
         for note in context_notes:
             context_texts.append(f"--- Note ID: {note['id']} ---\nTitle: {note['title']}\nContent: {note['content']}")
@@ -21,7 +20,10 @@ class LLMService:
         full_context = "\n\n".join(context_texts)
 
         system_prompt = (
-            "You are a helpful personal assistant..." # (seu prompt aqui)
+            "You are a helpful personal assistant managing a 'Second Brain' note system. "
+            "Answer the user's question using ONLY the context provided below. "
+            "If the context does not contain the answer, politely state that you cannot answer based on the current notes. "
+            "Answer in Brazilian Portuguese."
         )
         user_prompt = f"Context:\n{full_context}\n\nQuestion: {question}"
 
